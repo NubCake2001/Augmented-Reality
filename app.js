@@ -11,7 +11,7 @@ function main() {
   const near = 0.1;
   const far = 5;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.z = 2;
+  camera.position.z = 5;
 
   const scene = new THREE.Scene();
 
@@ -19,11 +19,23 @@ function main() {
   const boxHeight = 1;
   const boxDepth = 1;
   const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+  const color3 = new THREE.Color("rgb(215, 0, 0)");
+  const material = new THREE.MeshBasicMaterial({ color: color3 });  // greenish blue
 
-  const material = new THREE.MeshBasicMaterial({ color: 0x44aa88 });  // greenish blue
+  const trainComps = [];
+  function createTrainObj(geometry, color, x) {
+    const material = new THREE.MeshBasicMaterial({ color: color });
+    const cube = new THREE.Mesh(geometry, material);
+    scene.add(cube);
+    cube.position.x = x;
+    trainComps.push(cube);
+  }
 
-  const cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
+  createTrainObj(geometry, color3, 0);
+  createTrainObj(geometry, color3, 2);
+  createTrainObj(geometry, color3, -2);
+  // const cube = new THREE.Mesh(geometry, material);
+  // scene.add(cube);
 
   renderer.render(scene, camera);
 }
