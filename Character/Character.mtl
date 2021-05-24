@@ -1,0 +1,53 @@
+# Exported from Fuse 2017.1.0
+
+newmtl Bottom
+illum 4 
+Kd 1.00 1.00 1.00 
+Tf 1.00 1.00 1.00 
+Ni 1.00 
+Ks 1.00 1.00 1.00 
+Ns 512 
+adobe_reflectivity 0.04 
+adobe_bump_strength 0.0 
+d 1.0 
+
+map_d Character_Bottom_Opacity.png
+map_Kd Character_Bottom_Diffuse.png
+adobe_map_normal Character_Bottom_Normal.png
+map_Ks Character_Bottom_Specular.png
+adobe_map_shininess Character_Bottom_Gloss.png
+
+newmtl Top
+illum 4 
+Kd 1.00 1.00 1.00 
+Tf 1.00 1.00 1.00 
+Ni 1.00 
+Ks 1.00 1.00 1.00 
+Ns 512 
+adobe_reflectivity 0.04 
+adobe_bump_strength 0.0 
+d 1.0 
+
+map_d Character_Top_Opacity.png
+map_Kd Character_Top_Diffuse.png
+adobe_map_normal Character_Top_Normal.png
+map_Ks Character_Top_Specular.png
+adobe_map_shininess Character_Top_Gloss.png
+
+newmtl Body
+illum 4 
+Kd 1.00 1.00 1.00 
+Tf 1.00 1.00 1.00 
+Ni 1.00 
+Ks 1.00 1.00 1.00 
+Ns 512 
+adobe_reflectivity 0.04 
+adobe_bump_strength 0.0 
+d 1.0 
+
+map_d Character_Body_Opacity.png
+map_Kd Character_Body_Diffuse.png
+adobe_map_normal Character_Body_Normal.png
+map_Ks Character_Body_Specular.png
+adobe_map_shininess Character_Body_Gloss.png
+
