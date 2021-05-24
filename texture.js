@@ -165,7 +165,7 @@ export function streetLight(x, y, z, scene) {
 }
 
 
-export function assignSphericalUVs(geometry) {
+function assignSphericalUVs(geometry) {
     // geometry.computeBoundingBox();
     var positions = Array.from(geometry.attributes.position.array);
     for (var i = 0; i < positions.length / 3; i++) {
@@ -181,7 +181,7 @@ export function assignSphericalUVs(geometry) {
     // console.log(geometry.attributes.uv.array);
 }
 
-export function assignCylindricalUVs(geometry) {
+function assignCylindricalUVs(geometry) {
     var positions = Array.from(geometry.attributes.position.array);
     for (var i = 0; i < positions.length / 3; i++) {
         var x = positions[i * 3];
@@ -193,4 +193,48 @@ export function assignCylindricalUVs(geometry) {
         geometry.attributes.uv.array[i * 2 + 1] = V;
     }
     geometry.uvsNeedUpdate = true;
+}
+
+export function CylinderMapping() {
+    var loader = new THREE.TextureLoader();
+    var texture = loader.load('/grass2.jpeg');
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.magFilter = THREE.NearestFilter;
+    var repeatsX = 1;
+    var repeatsY = 1;
+    texture.repeat.set(repeatsX, repeatsY);
+    const geometry = new THREE.CylinderGeometry(5, 5, 20, 32);
+    assignCylindricalUVs(geometry);
+    const material = new THREE.MeshPhongMaterial({
+        map: texture,
+        side: THREE.DoubleSide,
+    });
+    var cylinder = new THREE.Mesh(geometry, material);
+    cylinder.scale.set(0.04, 0.04, 0.04);
+    cylinder.rotation.x = -Math.PI / 2;
+    cylinder.position.set(2, 0, 0);
+    return cylinder;
+}
+
+export function SphericalMapping() {
+    var loader = new THREE.TextureLoader();
+    var texture = loader.load('/grass2.jpeg');
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.magFilter = THREE.NearestFilter;
+    var repeatsX = 1;
+    var repeatsY = 1;
+    texture.repeat.set(repeatsX, repeatsY);
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    assignSphericalUVs(geometry);
+    const material = new THREE.MeshPhongMaterial({
+        map: texture,
+        side: THREE.DoubleSide,
+    });
+    var cylinder = new THREE.Mesh(geometry, material);
+    cylinder.scale.set(0.6, 0.6, 0.6);
+    cylinder.rotation.x = -Math.PI / 2;
+    cylinder.position.set(-2, 0, 0);
+    return cylinder;
 }

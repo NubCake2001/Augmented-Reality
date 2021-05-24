@@ -1,6 +1,6 @@
 import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/build/three.module.js';
 import { GUI } from './js/dat.gui.module.js';
-import { multVerticalRoad, assignSphericalUVs, assignCylindricalUVs, multHorRoad, trainTrack, grassFill, streetLight, Avatar } from './texture.js';
+import { multVerticalRoad, CylinderMapping, SphericalMapping, multHorRoad, trainTrack, grassFill, streetLight, Avatar } from './texture.js';
 import { createMeshes } from './train.js';
 import { OrbitControls } from 'https://threejsfundamentals.org/threejs/resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
 import { OBJLoader } from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/examples/jsm/loaders/OBJLoader.js';
@@ -16,14 +16,11 @@ function main() {
   var mainObj;
   var count = 0;
   var angle = 0;
-  var isRotate = false;
   var isSticked = false;
   var stickedObj;
   var jumpDir;
   var comeback;
   var isDrone = false;
-  var isFPP = false;
-  //--------------------------------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------------------------------
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
@@ -38,7 +35,7 @@ function main() {
   //--------------------------------------------------------------------------------------------------------
   var scene = new THREE.Scene();
   const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-  scene.add(ambientLight);
+  // scene.add(ambientLight)  ;
 
   var fov = 75;
   var aspect = canvas.clientWidth / canvas.clientHeight;  // the canvas default
@@ -78,32 +75,7 @@ function main() {
   // track(scene);
   multHorRoad(scene);
   multVerticalRoad(scene);
-  streetLight(0, 0, 0, scene);
-
-
-  //--------------------------------------------------------------------------------------------------------
-  var loader = new THREE.TextureLoader();
-  var texture = loader.load('/grass2.jpeg');
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.magFilter = THREE.NearestFilter;
-  var repeatsX = 1;
-  var repeatsY = 1;
-  texture.repeat.set(repeatsX, repeatsY);
-  const geometry = new THREE.CylinderGeometry(5, 5, 20, 32);
-  assignCylindricalUVs(geometry);
-  const material = new THREE.MeshPhongMaterial({
-    map: texture,
-    side: THREE.DoubleSide,
-  });
-  var cylinder = new THREE.Mesh(geometry, material);
-  // const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-  // const cylinder = new THREE.Mesh(geometry, material);
-  cylinder.scale.set(0.04, 0.04, 0.04);
-  cylinder.rotation.x = -Math.PI / 2;
-  cylinder.position.set(2, 0, 0);
-
-  scene.add(cylinder);
+  // streetLight(0, 0, 0, scene);
 
   //--------------------------------------------------------------------------------------------------------
   function createObj(geometry, color, x, y, z, fact, addtoScene = true) {
@@ -126,49 +98,107 @@ function main() {
   //--------------------------------------------------------------------------------------------------------
   var avs = {
     av1: function () {
-      var mtl_loader = new MTLLoader();
-      mtl_loader.load('Character/Character.mtl', function (materials) {
+      if (!mainObj) {
+        var mtl_loader = new MTLLoader();
+        mtl_loader.load('Character/Character.mtl', function (materials) {
 
-        materials.preload()
+          materials.preload()
 
-        const obj_loader = new OBJLoader();
-        obj_loader.setMaterials(materials);
-        obj_loader.setPath('Character/');
-        obj_loader.load('Character.obj', function (mesh) {
+          const obj_loader = new OBJLoader();
+          obj_loader.setMaterials(materials);
+          obj_loader.setPath('Character/');
+          obj_loader.load('Character.obj', function (mesh) {
 
-          mesh.position.set(0, 0, 0);
-          mesh.scale.set(0.005, 0.005, 0.005);
-          mesh.castShadow = true;
-          mesh.rotation.x = Math.PI / 2;
+            mesh.position.set(0, 0, 0);
+            mesh.scale.set(0.005, 0.005, 0.005);
+            mesh.castShadow = true;
+            mesh.rotation.x = Math.PI / 2;
 
-          scene.add(mesh);
-          mainObj = mesh;
-
-        })
-      });
+            scene.add(mesh);
+            mainObj = mesh;
+          })
+        });
+      }
     },
   };
   var Avatars = controls.addFolder("Select Avatar");
   Avatars.add(avs, 'av1').name('Spawn Avatar');
 
+  //--------------------------------------------------------------------------------------------------------
+  var loader = new THREE.TextureLoader();
+  var texture = loader.load('/grass2.jpeg');
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.magFilter = THREE.NearestFilter;
+  var repeatsX = 1;
+  var repeatsY = 1;
+  texture.repeat.set(repeatsX, repeatsY);
+  const geometry = new THREE.CylinderGeometry(5, 5, 20, 32);
+  const geometry1 = new THREE.BoxGeometry(1, 1, 1);
+
+  const material = new THREE.MeshPhongMaterial({
+    map: texture,
+    side: THREE.DoubleSide,
+  });
+  var cylinder = new THREE.Mesh(geometry, material);
+  var cylinderTem = new THREE.Mesh(geometry1, material);
+
+  // const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+  // const cylinder = new THREE.Mesh(geometry, material);
+  cylinder.scale.set(0.04, 0.04, 0.04);
+  cylinder.rotation.x = -Math.PI / 2;
+  cylinder.position.set(2, 0, 0);
+  scene.add(cylinder);
+  cylinderTem.scale.set(0.6, 0.6, 0.6);
+  cylinderTem.rotation.x = -Math.PI / 2;
+  cylinderTem.position.set(-2, 0, 0);
+  scene.add(cylinderTem);
+
+  var textureFun = {
+    cyl: false,
+    sph: false,
+  };
+
+  var isCyl = false;
+  var isSph = false;
+
+  var cylinder1 = CylinderMapping();
+  var cylinder2 = SphericalMapping();
+
+
+  var textControls = controls.addFolder("Texture Controls");
+  textControls.add(textureFun, 'cyl').onChange(function (value) {
+    if (isCyl) {
+      isCyl = false;
+      scene.remove(cylinder1);
+      scene.add(cylinder);
+    }
+    else {
+      isCyl = true;
+      scene.remove(cylinder);
+      scene.add(cylinder1);
+    }
+  }).name("Cylindrical Mapping");
+  textControls.add(textureFun, 'sph').onChange(function (value) {
+    if (isSph) {
+      isSph = false;
+      scene.remove(cylinder2);
+      scene.add(cylinderTem);
+    }
+    else {
+      isSph = true;
+      scene.remove(cylinderTem);
+      scene.add(cylinder2);
+    }
+  }).name("Spherical Mapping");
+
 
   //--------------------------------------------------------------------------------------------------------
   var optionsFun = {
     stick: false,
-    rotate: false,
   }
 
   var options = controls.addFolder("Options");
-  options.add(optionsFun, 'rotate').onChange(function (value) {
-    if (isRotate) {
-      isRotate = false;
-    }
-    else {
-      isRotate = true;
-    }
-    console.log(isRotate);
-  }).name("Rotate");
-
   options.add(optionsFun, 'stick').onChange(function (value) {
     if (isSticked == true) {
       isSticked = false;
@@ -311,11 +341,9 @@ function main() {
   //--------------------------------------------------------------------------------------------------------
   var light1 = new THREE.PointLight(new THREE.Color(1, 1, 0), 2.5, 2.5, 1);
   light1.position.set(2, 0, 1.5);
-  streetLight(1.6, 0, 0, scene);
 
   var light2 = new THREE.PointLight(new THREE.Color(1, 1, 0), 2.5, 2.5, 1);
   light2.position.set(-2, 0, 1.5);
-  streetLight(-1.6, 0, 0, scene);
 
 
   var light3 = new THREE.PointLight(new THREE.Color(1, 1, 0), 2.5, 2.5, 1);
